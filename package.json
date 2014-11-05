@@ -7,11 +7,14 @@
     "name" : "Pirate Party Czech Republic",
     "email" : "dev@pirati.cz"
   },
-  "license" : "LGPL-3.0+",
+  "license" : "Public domain",
   "main" : "./bin/gapi-sparql.js",
   "repository" : {
     "type" : "git",
     "url" : "https://github.com/pirati-cz/gapi-sparql.git"
+  },
+  "bugs": {
+    "url": "http://github.com/pirati-cz/gapi-sparql/issues"
   },
   "bin" : {
     "gapi-sparql" : "./bin/gapi-sparql.js"
