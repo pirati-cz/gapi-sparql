@@ -64,8 +64,8 @@ self = <span class="hljs-literal">null</span>
         
         <span class="hljs-property">@options</span>.name = <span class="hljs-string">'gapi-sparql'</span>
         <span class="hljs-property">@options</span>.version = <span class="hljs-string">'0.0.1'</span>
+        <span class="hljs-property">@options</span>.accept = 
         <span class="hljs-property">@options</span>.formatters = {}
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-property">@sparqlQuery</span>)
         <span class="hljs-property">@options</span>.formatters[<span class="hljs-string">'application/sparql-query'</span>] = <span class="hljs-property">@sparqlQuery</span>
         <span class="hljs-property">@options</span>.listenPort ?= <span class="hljs-number">8008</span></pre></div></div>
             
@@ -84,6 +84,10 @@ self = <span class="hljs-literal">null</span>
             
             <div class="content"><div class='highlight'><pre>        
         server = restify.createServer(<span class="hljs-property">@options</span>)
+        server.pre( <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span>
+            req.headers.accept = <span class="hljs-string">'application/sparql-query'</span>
+            <span class="hljs-keyword">return</span> next()
+        )
         server.listen(<span class="hljs-property">@options</span>.listenPort, <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
             <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s listening at %s'</span>, server.name, server.url)
         )
@@ -95,10 +99,24 @@ self = <span class="hljs-literal">null</span>
         
     <span class="hljs-attribute">sparqlQuery</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
         <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'GapiSparql @sparqlQuery()'</span>)
-        <span class="hljs-keyword">if</span> body <span class="hljs-keyword">instanceof</span> Error
-            res.statusCode = body.statusCode || <span class="hljs-number">500</span>
+        <span class="hljs-keyword">if</span> body <span class="hljs-keyword">instanceof</span> Error</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>res.statusCode = body.statusCode || 500</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-string">"err"</span>
         <span class="hljs-keyword">else</span>
-            <span class="hljs-string">"aaa"</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-string">"aaa"</span>
         <span class="hljs-built_in">console</span>.log(req)
         <span class="hljs-built_in">console</span>.log(res)
         <span class="hljs-built_in">console</span>.log(body)

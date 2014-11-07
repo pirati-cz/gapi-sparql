@@ -13,13 +13,17 @@ GapiSparql - Main class for GAPI SPARQL component
             
             @options.name = 'gapi-sparql'
             @options.version = '0.0.1'
+            @options.accept = 
             @options.formatters = {}
-            console.log(@sparqlQuery)
             @options.formatters['application/sparql-query'] = @sparqlQuery
             @options.listenPort ?= 8008
             # @options.accept 
             
             server = restify.createServer(@options)
+            server.pre( (req, res, next) ->
+                req.headers.accept = 'application/sparql-query'
+                return next()
+            )
             server.listen(@options.listenPort, () ->
                 console.log('%s listening at %s', server.name, server.url)
             )
@@ -32,12 +36,15 @@ GapiSparql - Main class for GAPI SPARQL component
         sparqlQuery: (req, res, body) ->
             console.log('GapiSparql @sparqlQuery()')
             if body instanceof Error
-                res.statusCode = body.statusCode || 500
+                # res.statusCode = body.statusCode || 500
+                return "err"
             else
-                "aaa"
+                return "aaa"
             console.log(req)
             console.log(res)
             console.log(body)
-                
+        
+        use: (pluginName) ->
+            
       
     module.exports = GapiSparql
