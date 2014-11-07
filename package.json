@@ -17,9 +17,10 @@
     "url": "http://github.com/pirati-cz/gapi-sparql/issues"
   },
   "bin" : {
-    "gapi-sparql" : "./bin/gapi-sparql.js"
+    "gapi-sparql" : "./bin/gapi_sparql.js"
   },
   "scripts" : {
+    "start": "node ./bin/gapi_sparql.js",
     "test" : "gulp scripts tests && mocha -R spec ./test/lib",
     "prepublish" : "gulp scripts tests && docco ./src/*coffee"
   },
