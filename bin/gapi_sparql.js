@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-var rest = require('../lib/gapirest'),
+var gapi_sparql = require('../lib/gapi_sparql'),
     argv = require('yargs')
         .alias('h', 'host')
         .alias('p', 'port')
-        .alias('d', 'database')
         .argv;
 
 function exit(message, exit_code) {
@@ -17,4 +16,4 @@ function exit(message, exit_code) {
 process.on('SIGINT', function () {
     exit('Recieved SIGINT. bye')
 });
-rest.run(argv, exit);
+gapi_sparql.run(argv, exit);
