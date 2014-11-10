@@ -80,7 +80,7 @@ self = <span class="hljs-literal">null</span>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@options</span>.listenPort ?= <span class="hljs-number">443</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@options</span>.listenPort ?= process.env.PORT || <span class="hljs-number">8008</span></pre></div></div>
             
         </li>
         
