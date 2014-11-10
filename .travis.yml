@@ -1,9 +1,10 @@
 language: node_js
 node_js:
-- 0.10
+- 0.1
 deploy:
   provider: heroku
-  app: gapi-sparql
   api_key:
-    secure: "m2hy1Pt5xzZD7SRlsxyRl64aMvtIKYaB44s5lu6U8YypxMWM6po2oH/LQvB25gRlm2w7gAuwes1e0tlP3wkR/7mPkoT/r/FmXA7S9aOj4u+l4l92sAwDcH8AJCrBu3wdRaI4ZoTUmF49q3i5bm6h/Wqrjx9LO+37KXnBDkRkk7Y="
-  strategy: git
+    secure: M00Z9iwhvoC/0+vxCaN7EB+V0+lhHmHPhVqgFYWKdK8ItDUeqSHFFijlG6ZcByz5OpIIOcCudVwz3O/izkRTcE95/Tm8Y5G1NTHVSHDeC821+mWiOxI4jS3sRB/wzLYHyqDP8prIYo8KbokZp1ucMcEnKgwwVrT6DGHK0v+ifhY=
+  app: gapi-sparql
+  on:
+    repo: pirati-cz/gapi-sparql
