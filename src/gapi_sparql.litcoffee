@@ -7,7 +7,6 @@ GapiSparql - Main class for GAPI SPARQL component
     class GapiSparql
 
         constructor: (options) ->
-            console.log('GapiSparql construct...')
             self = @
             @options = options or {}
             
@@ -41,11 +40,9 @@ GapiSparql - Main class for GAPI SPARQL component
             @server = server
 
         @run: (argv, exit) ->
-            console.log('GapiSparql @run()')
             gapisparql = new GapiSparql()
             
         sparqlQuery: (req, res, body) ->
-            console.log('GapiSparql @sparqlQuery()')
             body = "ahok"
             #console.log(body)
             #console.log('----- GapiSparql @sparqlQuery() -----');

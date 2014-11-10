@@ -7,7 +7,7 @@ var paths = {
     out: 'lib'
   },
   tests: {
-    in: 'test/**/*coffee',
+    in: 'test/src/**/*coffee',
     out: 'test/lib'
   }
 };
