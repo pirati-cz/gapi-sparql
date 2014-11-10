@@ -1,1 +1,1 @@
-worker: node bin/gapi_sparql.js
+web: node bin/gapi_sparql.js
