@@ -58,7 +58,6 @@ self = <span class="hljs-literal">null</span>
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GapiSparql</span></span>
 
     <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'GapiSparql construct...'</span>)
         self = @
         <span class="hljs-property">@options</span> = options <span class="hljs-keyword">or</span> {}
         
@@ -80,7 +79,7 @@ self = <span class="hljs-literal">null</span>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@options</span>.listenPort ?= process.env.PORT || <span class="hljs-number">8008</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@options</span>.listenPort ?= process.env.PORT || <span class="hljs-number">5000</span></pre></div></div>
             
         </li>
         
@@ -144,11 +143,9 @@ self = <span class="hljs-literal">null</span>
         <span class="hljs-property">@server</span> = server
 
     <span class="hljs-property">@run</span>: <span class="hljs-function"><span class="hljs-params">(argv, exit)</span> -&gt;</span>
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'GapiSparql @run()'</span>)
         gapisparql = <span class="hljs-keyword">new</span> GapiSparql()
         
     <span class="hljs-attribute">sparqlQuery</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'GapiSparql @sparqlQuery()'</span>)
         body = <span class="hljs-string">"ahok"</span></pre></div></div>
             
         </li>
