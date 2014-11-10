@@ -16,7 +16,7 @@ GapiSparql - Main class for GAPI SPARQL component
             @options.accept = 
             #@options.formatters = {}
             #@options.formatters['application/sparql-query'] = @sparqlQuery
-            @options.listenPort ?= 443
+            @options.listenPort ?= 8008
             # @options.accept 
             
             server = restify.createServer(@options)
