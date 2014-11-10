@@ -3,6 +3,7 @@ node_js:
 - 0.1
 deploy:
   provider: heroku
+  strategy: git
   api_key:
     secure: M00Z9iwhvoC/0+vxCaN7EB+V0+lhHmHPhVqgFYWKdK8ItDUeqSHFFijlG6ZcByz5OpIIOcCudVwz3O/izkRTcE95/Tm8Y5G1NTHVSHDeC821+mWiOxI4jS3sRB/wzLYHyqDP8prIYo8KbokZp1ucMcEnKgwwVrT6DGHK0v+ifhY=
   app: gapi-sparql
