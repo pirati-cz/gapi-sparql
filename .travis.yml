@@ -5,7 +5,7 @@ deploy:
   provider: heroku
   strategy: api
   api_key:
-    secure: "M00Z9iwhvoC/0+vxCaN7EB+V0+lhHmHPhVqgFYWKdK8ItDUeqSHFFijlG6ZcByz5OpIIOcCudVwz3O/izkRTcE95/Tm8Y5G1NTHVSHDeC821+mWiOxI4jS3sRB/wzLYHyqDP8prIYo8KbokZp1ucMcEnKgwwVrT6DGHK0v+ifhY="
+    secure: ASfIqHJlthpK1v+W7ZVJhFhth1OPA1NcJAqADgrdok8zcPTRsbp7y44LIrrBnEF9Pcirb8jAhNquu8VXrXmpbugbGpc4tLdJCfyJWahGE0y9SqoNSm/585fs53VR9tkS0R/+qRl9CwU7rn/L6gUawdwYrYUcsYTqzyMW0O2hHo8=
   app: gapi-sparql
   on:
     repo: pirati-cz/gapi-sparql
