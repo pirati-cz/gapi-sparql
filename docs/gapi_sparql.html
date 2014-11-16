@@ -53,17 +53,27 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>restify = <span class="hljs-built_in">require</span>(<span class="hljs-string">'restify'</span>)
+fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>)
 self = <span class="hljs-literal">null</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GapiSparql</span></span>
 
     <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(options)</span> -&gt;</span>
         self = @
+        <span class="hljs-property">@static_page_temp</span> = <span class="hljs-literal">null</span>
         <span class="hljs-property">@options</span> = options <span class="hljs-keyword">or</span> {}
         
         <span class="hljs-property">@options</span>.name = <span class="hljs-string">'gapi-sparql'</span>
         <span class="hljs-property">@options</span>.version = <span class="hljs-string">'0.0.1'</span>
-        <span class="hljs-property">@options</span>.accept =</pre></div></div>
+        <span class="hljs-property">@options</span>.listenPort ?= process.env.PORT || <span class="hljs-number">5000</span>
+        <span class="hljs-property">@options</span>.accept = [
+            <span class="hljs-string">'text/html'</span>,
+            <span class="hljs-string">'text/csv'</span>,
+            <span class="hljs-string">'text/tab-separated-values'</span>,
+            <span class="hljs-string">'application/sparql-results+xml'</span>,
+            <span class="hljs-string">'application/sparql-results+json'</span>
+        ]
+        <span class="hljs-property">@options</span>.formatters = {</pre></div></div>
             
         </li>
         
@@ -74,12 +84,24 @@ self = <span class="hljs-literal">null</span>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>@options.formatters = {}
-@options.formatters[‘application/sparql-query’] = @sparqlQuery</p>
+              <p>defaults
+‘text/plain’: @errorFormat,
+‘application/javascript’: @errorFormat,
+‘application/json’: @errorFormat,
+‘application/octet-stream’: @errorFormat,</p>
+<h1 id="-errorformat-">‘<em>/</em>‘: @errorFormat,</h1>
+<p>supported output</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@options</span>.listenPort ?= process.env.PORT || <span class="hljs-number">5000</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-string">'text/html'</span>: <span class="hljs-property">@htmlFormat</span>,
+            <span class="hljs-string">'text/csv'</span>: <span class="hljs-property">@csvFormat</span>,
+            <span class="hljs-string">'text/tab-separated-values'</span>: <span class="hljs-property">@tabFormat</span>,
+            <span class="hljs-string">'application/sparql-results+xml'</span>: <span class="hljs-property">@xmlFormat</span>
+            <span class="hljs-string">'application/sparql-results+json'</span>: <span class="hljs-property">@jsonFormat</span>
+        }
+
+        server = restify.createServer(<span class="hljs-property">@options</span>)</pre></div></div>
             
         </li>
         
@@ -90,12 +112,60 @@ self = <span class="hljs-literal">null</span>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>@options.accept </p>
+              <p>server.use(restify.acceptParser(server.acceptable));
+server.pre(restify.pre.sanitizePath())</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        
-        server = restify.createServer(<span class="hljs-property">@options</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        server.use(restify.bodyParser())
+        server.use(restify.queryParser())
+        server.use(restify.urlEncodedBodyParser())
+        server.listen(<span class="hljs-property">@options</span>.listenPort, <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s listening at %s'</span>, server.name, server.url)
+        )
+        <span class="hljs-property">@server</span> = server
+
+    <span class="hljs-property">@run</span>: <span class="hljs-function"><span class="hljs-params">(argv, exit)</span> -&gt;</span>
+        gapisparql = <span class="hljs-keyword">new</span> GapiSparql()
+        gapisparql.server.get(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span> <span class="hljs-keyword">return</span> gapisparql.query(<span class="hljs-string">'GET'</span>, req, res, next))
+        gapisparql.server.post(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span> <span class="hljs-keyword">return</span> gapisparql.query(<span class="hljs-string">'POST'</span>, req, res, next))
+        gapisparql.server.put(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span> <span class="hljs-keyword">return</span> gapisparql.query(<span class="hljs-string">'PUT'</span>, req, res, next))
+        gapisparql.server.del(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span> <span class="hljs-keyword">return</span> gapisparql.query(<span class="hljs-string">'DELETE'</span>, req, res, next))
+        
+    <span class="hljs-attribute">query</span>: <span class="hljs-function"><span class="hljs-params">(method, req, res, next)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log(method+<span class="hljs-string">': '</span>+req.url)
+        accept = req.accepts(<span class="hljs-property">@options</span>.accept)
+        <span class="hljs-keyword">if</span>(accept == <span class="hljs-literal">undefined</span>)
+            body = <span class="hljs-string">"Not Acceptable. Supported Accepts: "</span>+<span class="hljs-property">@options</span>.accept
+            res.writeHead(<span class="hljs-number">406</span>, {
+                <span class="hljs-string">'Content-Length'</span>: Buffer.byteLength(body),
+                <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/plain'</span>
+            })
+            res.write(body)
+            res.end()
+        <span class="hljs-keyword">else</span>
+            res.send(<span class="hljs-number">404</span>, <span class="hljs-keyword">new</span> restify.ResourceNotFoundError())
+        <span class="hljs-keyword">return</span> next()
+    
+    <span class="hljs-attribute">jsonFormat</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"jsonFormat"</span>)
+        <span class="hljs-keyword">return</span> JSON.stringify(body, <span class="hljs-literal">null</span>, <span class="hljs-string">'  '</span>)
+    
+    <span class="hljs-attribute">xmlFormat</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"xmlFormat"</span>)
+    
+    <span class="hljs-attribute">csvFormat</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"csvFormat"</span>)
+    
+    <span class="hljs-attribute">tabFormat</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"tabFormat"</span>)
+
+    <span class="hljs-attribute">htmlFormat</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> =&gt;</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"htmlFormat"</span>)
+        title = <span class="hljs-string">'GAPI'</span>
+        <span class="hljs-keyword">if</span> body <span class="hljs-keyword">instanceof</span> restify.ResourceNotFoundError
+            res.statusCode = <span class="hljs-number">200</span>
+            <span class="hljs-keyword">if</span> <span class="hljs-property">@static_page_temp</span> == <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
@@ -106,17 +176,11 @@ self = <span class="hljs-literal">null</span>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>server.pre( (req, res, next) -&gt;
-   req.headers.accept = ‘application/sparql-query’
-   return next()
-)</p>
+              <p>css</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        server.listen(<span class="hljs-property">@options</span>.listenPort, <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
-            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s listening at %s'</span>, server.name, server.url)
-        )
-        server.get(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-params">(req, res, next)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>                style = fs.readFileSync(<span class="hljs-string">'resources/style.min.css'</span>,{<span class="hljs-string">'encoding'</span>: <span class="hljs-string">'utf-8'</span>})</pre></div></div>
             
         </li>
         
@@ -127,26 +191,13 @@ self = <span class="hljs-literal">null</span>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>console.log(res)</p>
+              <p>javascripts</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            d = <span class="hljs-string">"ahoj svete"</span>
-            res.writeHead(<span class="hljs-number">200</span>, {
-                <span class="hljs-string">'Content-Length'</span>: Buffer.byteLength(d),
-                <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/plain'</span>
-            })
-            res.write(d)
-            res.end()
-            next()
-        )
-        <span class="hljs-property">@server</span> = server
-
-    <span class="hljs-property">@run</span>: <span class="hljs-function"><span class="hljs-params">(argv, exit)</span> -&gt;</span>
-        gapisparql = <span class="hljs-keyword">new</span> GapiSparql()
-        
-    <span class="hljs-attribute">sparqlQuery</span>: <span class="hljs-function"><span class="hljs-params">(req, res, body)</span> -&gt;</span>
-        body = <span class="hljs-string">"ahok"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>                d3 = fs.readFileSync(<span class="hljs-string">'resources/d3.v3.min.js'</span>,{<span class="hljs-string">'encoding'</span>: <span class="hljs-string">'utf-8'</span>})
+                jquery = fs.readFileSync(<span class="hljs-string">'resources/jquery.min.js'</span>,{<span class="hljs-string">'encoding'</span>: <span class="hljs-string">'utf-8'</span>})
+                script = fs.readFileSync(<span class="hljs-string">'resources/script.min.js'</span>,{<span class="hljs-string">'encoding'</span>: <span class="hljs-string">'utf-8'</span>})</pre></div></div>
             
         </li>
         
@@ -157,88 +208,20 @@ self = <span class="hljs-literal">null</span>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>console.log(body)
-console.log(‘——- GapiSparql @sparqlQuery() ——-‘);</p>
-<h1 id="-">#</h1>
+              <p>page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> body <span class="hljs-keyword">instanceof</span> Error
-            res.statusCode = body.statusCode || <span class="hljs-number">500</span>
-            <span class="hljs-keyword">if</span> body.body</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <p>console.log(‘dada’);
-body = body.body.message</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                body = <span class="hljs-string">"ttt"</span>
-            <span class="hljs-keyword">else</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
-              </div>
-              <p>body = message: body.message</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                body = <span class="hljs-string">"fifif"</span>
-            data = <span class="hljs-string">"err"</span>
-        <span class="hljs-keyword">else</span>
-            body = <span class="hljs-string">"body pyco"</span>
-            data = <span class="hljs-string">"aaa"</span>
-        <span class="hljs-built_in">console</span>.log(body)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
-              </div>
-              <p>console.log(req)
-console.log(res)
-console.log(body)</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        res.setHeader(<span class="hljs-string">'Content-Length'</span>, Buffer.byteLength(body))
-        <span class="hljs-keyword">return</span> body</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <h1 id="-">#</h1>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> body
+            <div class="content"><div class='highlight'><pre>                static_page_temp = fs.readFileSync(<span class="hljs-string">'resources/index.html'</span>,{<span class="hljs-string">'encoding'</span>: <span class="hljs-string">'utf-8'</span>})
+                static_page_temp = static_page_temp.replace(<span class="hljs-string">'{% style %}'</span>,style)
+                static_page_temp = static_page_temp.replace(<span class="hljs-string">'{% d3 %}'</span>,d3)
+                static_page_temp = static_page_temp.replace(<span class="hljs-string">'{% jquery %}'</span>,jquery)
+                static_page_temp = static_page_temp.replace(<span class="hljs-string">'{% script %}'</span>,script)
+                <span class="hljs-property">@static_page_temp</span> = static_page_temp
+                
+        <span class="hljs-keyword">return</span> <span class="hljs-property">@static_page_temp</span>
     
-    <span class="hljs-attribute">use</span>: <span class="hljs-function"><span class="hljs-params">(pluginName)</span> -&gt;</span>
-        
+    <span class="hljs-attribute">use</span>: <span class="hljs-function"><span class="hljs-params">(pluginName)</span> -&gt;</span>      
   
 <span class="hljs-built_in">module</span>.exports = GapiSparql</pre></div></div>
             
