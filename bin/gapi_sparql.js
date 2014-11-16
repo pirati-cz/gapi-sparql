@@ -14,6 +14,6 @@ function exit(message, exit_code) {
 }
 
 process.on('SIGINT', function () {
-    exit('Recieved SIGINT. bye')
+    exit("\nRecieved SIGINT. bye")
 });
 gapi_sparql.run(argv, exit);
