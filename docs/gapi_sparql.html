@@ -31,24 +31,31 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-  <span class="hljs-keyword">var</span> GapiSparql, restify, self, sparql;
+<span class="hljs-pi">  'use strict'</span>;
+  <span class="hljs-keyword">var</span> should;
 
-  restify = <span class="hljs-built_in">require</span>(<span class="hljs-string">'restify'</span>);
+  should = <span class="hljs-built_in">require</span>(<span class="hljs-string">'should'</span>);
 
-  sparql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/sparql'</span>);
+  describe(<span class="hljs-string">'GapiSparql'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> GapiSparql, gapisparql;
+    GapiSparql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../../lib/gapi_sparql'</span>);
+    gapisparql = <span class="hljs-keyword">new</span> GapiSparql();
+    it(<span class="hljs-string">'should create gapi-sparql server'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+      gapisparql.should.be[<span class="hljs-string">"instanceof"</span>](GapiSparql);
+      <span class="hljs-keyword">return</span> done();
+    });
+    <span class="hljs-keyword">return</span> after(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{});
+  });
 
-  self = <span class="hljs-literal">null</span>;
-
-  GapiSparql = (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">GapiSparql</span><span class="hljs-params">(options)</span> </span>{
-      <span class="hljs-keyword">var</span> server, _base;
-      self = <span class="hljs-keyword">this</span>;
-      <span class="hljs-keyword">this</span>.static_page_temp = <span class="hljs-literal">null</span>;
-      <span class="hljs-keyword">this</span>.options = options || {};
-      <span class="hljs-keyword">this</span>.options.mode = <span class="hljs-string">'simple'</span>;
-      <span class="hljs-keyword">this</span>.options.name = <span class="hljs-string">'gapi-sparql'</span>;
-      <span class="hljs-keyword">this</span>.options.version = <span class="hljs-string">'0.0.1'</span>;
-      <span class="hljs-keyword">if</span> ((_base = <span class="hljs-keyword">this</span>.options).listenPort == <span class="hljs-literal">null</span>) {
+}).call(<span class="hljs-keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
+(_base = <span class="hljs-keyword">this</span>.options).listenPort == <span class="hljs-literal">null</span>) {
         _base.listenPort = process.env.PORT || <span class="hljs-number">5000</span>;
       }
       <span class="hljs-keyword">this</span>.options.accept = [<span class="hljs-string">'text/html'</span>, <span class="hljs-string">'text/csv'</span>, <span class="hljs-string">'text/tab-separated-values'</span>, <span class="hljs-string">'application/sparql-results+xml'</span>, <span class="hljs-string">'application/sparql-results+json'</span>];
