@@ -1,4 +1,6 @@
 
+GAPI Sparql class
+
     rdfstore = require('rdfstore')
     self = null
 

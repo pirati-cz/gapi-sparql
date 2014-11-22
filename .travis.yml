@@ -1,6 +1,11 @@
 language: node_js
 node_js:
 - 0.1
+addons:
+  code_climate:
+    repo_token: 30e334dd2c815828380b1a738aeacd6f537f68ac50328277dbdb5e70c37806bb
+after_script:
+  - cat coverage/lcov.info | codeclimate
 deploy:
   provider: heroku
   strategy: api
