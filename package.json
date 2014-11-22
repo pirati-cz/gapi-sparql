@@ -43,6 +43,7 @@
     "gulp-coffee" : "~1.4.3",
     "gulp-istanbul": "*",
     "gulp-mocha": "*",
-    "gulp-docco" : "*"
+    "gulp-docco" : "*",
+    "codeclimate-test-reporter": "*"
   }
 }
