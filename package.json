@@ -22,8 +22,7 @@
   "scripts" : {
     "start": "node ./bin/gapi_sparql.js",
     "prepublish" : "gulp",
-    "test" : "gulp tests",
-    "//": "&& docco ./src/*coffee"
+    "test" : "gulp tests"
   },
   "dependencies" : {
     "mongoose" : "~3.8.8",
