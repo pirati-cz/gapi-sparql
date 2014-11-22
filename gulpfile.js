@@ -20,18 +20,18 @@ var paths = {
 
 gulp.task('compile-scripts', function () {
     return gulp.src(paths.scripts.in)
-            .pipe(docco())
-            .pipe(gulp.dest(paths.docs.out))
             .pipe(coffee())
             .pipe(gulp.dest(paths.scripts.out));
+//            .pipe(docco())
+//            .pipe(gulp.dest(paths.docs.out));
 });
 
 gulp.task('compile-tests', function () {
     return gulp.src(paths.tests.in)
-            .pipe(docco())
-            .pipe(gulp.dest(paths.docs.out))
             .pipe(coffee())
             .pipe(gulp.dest(paths.tests.out));
+//            .pipe(docco())
+//            .pipe(gulp.dest(paths.docs.out));
 });
 
 gulp.task('tests', ['default'], function () {

@@ -12,5 +12,5 @@
         )
         
         after ->
-            gapisparql.stop()
+            # gapisparql.stop()
     )
