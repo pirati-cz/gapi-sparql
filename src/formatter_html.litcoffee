@@ -14,8 +14,8 @@ Restify formatter - text/html
             @static_page_temp = null
             @resources_path = 'resources/formatter_html'
             
-        output= (req, res, body) =>
-            console.log("htmlFormat")
+        output: (req, res, body) =>
+            console.log("htmlFormat") if @options.debug>1
             title = 'GAPI'
             if body instanceof restify.ResourceNotFoundError
                 res.statusCode = 200

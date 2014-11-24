@@ -31,46 +31,80 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-  <span class="hljs-keyword">var</span> GapiSparql, restify, self, sparql;
+<span class="hljs-pi">  'use strict'</span>;
+  <span class="hljs-keyword">var</span> http, should;
 
-  restify = <span class="hljs-built_in">require</span>(<span class="hljs-string">'restify'</span>);
+  should = <span class="hljs-built_in">require</span>(<span class="hljs-string">'should'</span>);
 
-  sparql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/sparql'</span>);
+  http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
 
-  self = <span class="hljs-literal">null</span>;
+  describe(<span class="hljs-string">'GapiSparql class'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> GapiSparql, gapisparql;
+    GapiSparql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../../lib/gapi_sparql'</span>);
+    gapisparql = <span class="hljs-keyword">new</span> GapiSparql({
+      debug: <span class="hljs-number">0</span>
+    });
+    it(<span class="hljs-string">'create server object'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+      gapisparql.should.be[<span class="hljs-string">"instanceof"</span>](GapiSparql);
+      <span class="hljs-keyword">return</span> done();
+    });
+    <span class="hljs-keyword">return</span> describe(<span class="hljs-string">'Server testing'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+      before(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+        <span class="hljs-keyword">return</span> gapisparql.start(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+          <span class="hljs-keyword">return</span> done();
+        });
+      });
+      it(<span class="hljs-string">'server GET */* request'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+        <span class="hljs-keyword">var</span> r;
+        <span class="hljs-keyword">return</span> r = http.request({
+          host: gapisparql.server.address().address,
+          port: gapisparql.server.address().port,
+          method: <span class="hljs-string">'GET'</span>,
+          path: <span class="hljs-string">'/'</span>
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(res)</span> </span>{
+          res.statusCode.should.equal(<span class="hljs-number">406</span>);
+          <span class="hljs-keyword">return</span> done();
+        }).end(<span class="hljs-string">'Nothing...'</span>);
+      });
+      it(<span class="hljs-string">'server GET text/html request'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+        <span class="hljs-keyword">var</span> r;
+        <span class="hljs-keyword">return</span> r = http.request({
+          host: gapisparql.server.address().address,
+          port: gapisparql.server.address().port,
+          method: <span class="hljs-string">'GET'</span>,
+          path: <span class="hljs-string">'/'</span>,
+          headers: {
+            accept: <span class="hljs-string">'text/html'</span>
+          }
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(res)</span> </span>{
+          res.statusCode.should.equal(<span class="hljs-number">200</span>);
+          <span class="hljs-keyword">return</span> done();
+        }).end(<span class="hljs-string">'Nothing...'</span>);
+      });
+      <span class="hljs-keyword">return</span> after(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(done)</span> </span>{
+        <span class="hljs-keyword">return</span> gapisparql.stop(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+          <span class="hljs-keyword">return</span> done();
+        });
+      });
+    });
+  });
 
-  GapiSparql = (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">GapiSparql</span><span class="hljs-params">(options)</span> </span>{
-      <span class="hljs-keyword">var</span> server, _base;
-      self = <span class="hljs-keyword">this</span>;
-      <span class="hljs-keyword">this</span>.static_page_temp = <span class="hljs-literal">null</span>;
-      <span class="hljs-keyword">this</span>.options = options || {};
-      <span class="hljs-keyword">this</span>.options.mode = <span class="hljs-string">'simple'</span>;
-      <span class="hljs-keyword">this</span>.options.name = <span class="hljs-string">'gapi-sparql'</span>;
-      <span class="hljs-keyword">this</span>.options.version = <span class="hljs-string">'0.0.1'</span>;
-      <span class="hljs-keyword">if</span> ((_base = <span class="hljs-keyword">this</span>.options).listenPort == <span class="hljs-literal">null</span>) {
-        _base.listenPort = process.env.PORT || <span class="hljs-number">5000</span>;
-      }
-      <span class="hljs-keyword">this</span>.options.accept = [<span class="hljs-string">'text/html'</span>, <span class="hljs-string">'text/csv'</span>, <span class="hljs-string">'text/tab-separated-values'</span>, <span class="hljs-string">'application/sparql-results+xml'</span>, <span class="hljs-string">'application/sparql-results+json'</span>];
-      <span class="hljs-keyword">this</span>.options.formatters = {
-        <span class="hljs-string">'text/csv'</span>: (<span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/formatter_csv'</span>))(<span class="hljs-keyword">this</span>.options)).output,
-        <span class="hljs-string">'text/tab-separated-values'</span>: (<span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/formatter_tab'</span>))(<span class="hljs-keyword">this</span>.options)).output,
-        <span class="hljs-string">'application/sparql-results+xml'</span>: (<span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/formatter_xml'</span>))(<span class="hljs-keyword">this</span>.options)).output,
-        <span class="hljs-string">'application/sparql-results+json'</span>: (<span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/formatter_json'</span>))(<span class="hljs-keyword">this</span>.options)).output,
-        <span class="hljs-string">'*/*'</span>: (<span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/formatter_error'</span>))(<span class="hljs-keyword">this</span>.options)).output
-      };
-      server = restify.createServer(<span class="hljs-keyword">this</span>.options);
-      server.use(restify.bodyParser());
-      server.use(restify.queryParser());
-      server.use(restify.urlEncodedBodyParser());
-      <span class="hljs-keyword">this</span>.server = server;
+}).call(<span class="hljs-keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
+an class="hljs-keyword">this</span>.server = server;
     }
 
     GapiSparql.run = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(argv, exit)</span> </span>{
       <span class="hljs-keyword">var</span> gapisparql;
       <span class="hljs-keyword">this</span>.argv = argv;
       <span class="hljs-keyword">this</span>.exit = exit;
-      gapisparql = <span class="hljs-keyword">new</span> GapiSparql();
+      gapisparql = <span class="hljs-keyword">new</span> GapiSparql(<span class="hljs-keyword">this</span>.argv);
       gapisparql.start();
       gapisparql.server.get(<span class="hljs-string">'/.*/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, next)</span> </span>{
         <span class="hljs-keyword">return</span> gapisparql.query(<span class="hljs-string">'GET'</span>, req, res, next);
@@ -86,14 +120,25 @@
       });
     };
 
-    GapiSparql.prototype.start = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.server.listen(<span class="hljs-keyword">this</span>.options.listenPort, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s listening at %s'</span>, <span class="hljs-keyword">this</span>.server.name, <span class="hljs-keyword">this</span>.server.url);
-      });
+    GapiSparql.prototype.start = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(callback)</span> </span>{
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.server.listen(<span class="hljs-keyword">this</span>.options.listenPort, <span class="hljs-keyword">this</span>.options.host, (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(_this)</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+          <span class="hljs-keyword">if</span> (_this.options.debug &gt; <span class="hljs-number">0</span>) {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'%s listening at %s'</span>, _this.server.name, _this.server.url);
+          }
+          <span class="hljs-keyword">if</span> (callback) {
+            <span class="hljs-keyword">return</span> callback();
+          }
+        };
+      })(<span class="hljs-keyword">this</span>));
     };
 
-    GapiSparql.prototype.stop = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.server.close();
+    GapiSparql.prototype.stop = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(callback)</span> </span>{
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.server.close(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">if</span> (callback) {
+          <span class="hljs-keyword">return</span> callback();
+        }
+      });
     };
 
     GapiSparql.prototype.query = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(method, req, res, next)</span> </span>{
