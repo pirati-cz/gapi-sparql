@@ -44,14 +44,14 @@
     }
 
     FormatterError.prototype.output = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, body)</span> </span>{
-      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"errorFormat"</span>);
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.options.debug &gt; <span class="hljs-number">1</span>) {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"htmlFormat"</span>);
+      }
+      res.statusCode = <span class="hljs-number">406</span>;
       body = <span class="hljs-string">"Not Acceptable. Supported Accepts: "</span> + <span class="hljs-keyword">this</span>.options.accept;
-      res.writeHead(<span class="hljs-number">406</span>, {
-        <span class="hljs-string">'Content-Length'</span>: Buffer.byteLength(body),
-        <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/plain'</span>
-      });
-      res.write(body);
-      <span class="hljs-keyword">return</span> res.end();
+      res.setHeader(<span class="hljs-string">'content-type'</span>, <span class="hljs-string">'text/plain'</span>);
+      res.setHeader(<span class="hljs-string">'content-length'</span>, Buffer.byteLength(body));
+      <span class="hljs-keyword">return</span> body;
     };
 
     <span class="hljs-keyword">return</span> FormatterError;

@@ -27,6 +27,7 @@ gulp.task('compile-scripts', function () {
 });
 
 gulp.task('compile-tests', function () {
+    var docco = require("gulp-docco");
     return gulp.src(paths.tests.in)
             .pipe(coffee())
             .pipe(gulp.dest(paths.tests.out))
@@ -34,16 +35,18 @@ gulp.task('compile-tests', function () {
             .pipe(gulp.dest(paths.docs.out));
 });
 
-gulp.task('tests', ['default'], function () {
+gulp.task('tests', ['default'], function () {    
     return gulp.src(paths.scripts.out + '/**/*.js')
             .pipe(istanbul())
             .on('finish', function () {
                 gulp.src(paths.tests.out + '/*.js', {read: false})
-                        .pipe(mocha({reporter: 'spec'}))
+                        .pipe(mocha({
+                            reporter: 'spec',
+                            timeout: 2000
+                        }))
                         .pipe(istanbul.writeReports({
                             reporters: ['lcov', 'text', 'text-summary']
                         }));
-
             });
 });
 

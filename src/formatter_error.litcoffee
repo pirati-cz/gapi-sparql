@@ -11,13 +11,11 @@ Restify formatter - */*
             @options = options
         
         output: (req, res, body) =>
-            console.log("errorFormat")
+            console.log("htmlFormat") if @options.debug>1
+            res.statusCode = 406
             body = "Not Acceptable. Supported Accepts: "+@options.accept
-            res.writeHead(406, {
-                'Content-Length': Buffer.byteLength(body),
-                'Content-Type': 'text/plain'
-            })
-            res.write(body)
-            res.end()
+            res.setHeader('content-type', 'text/plain')
+            res.setHeader('content-length', Buffer.byteLength(body))
+            return body
         
     module.exports = FormatterError
